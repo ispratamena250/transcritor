@@ -3,32 +3,37 @@ import sys
 import os
 
 def main():
-    if len(sys.argv) < 2:
-        print("Uso: python transcritor.py <arquivo-de-audio>")
+    if len(sys.argv) < 3:
+        print("Error. Run: python transcritor.py <audio-file> <output-file>")
         return
 
-    caminho_audio = sys.argv[1]
+    audio_path = sys.argv[1]
+    output_file = sys.argv[2]
 
-    if not os.path.exists(caminho_audio):
-        print(f"Erro: arquivo '{caminho_audio}' não encontrado.")
+    if not os.path.exists(audio_path):
+        print(f"Error: file '{audio_path}' not found.")
         return
 
-    print("Carregando modelo Whisper...")
+    output_dir = os.path.exists(audio_path)
+    if output_dir != "" and not os.path.exists(output_dir):
+        print(f"Error: directory {output_dir} does not exist")
+        return
+
+    print("Loading Whisper model...")
     model = whisper.load_model("small", device="cpu")
 
-    print(f"Transcrevendo: {caminho_audio}")
+    print(f"Transcribing: {audio_path}")
 
     resultado = model.transcribe(
-        caminho_audio,
+        audio_path,
         language="pt",
-        fp16=False  # Necessário na CPU
+        fp16=False
     )
 
-    saida = "transcricao.dat"
-    with open(saida, "w", encoding="utf-8") as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         f.write(resultado["text"])
 
-    print(f"Transcrição salva em {saida}")
+    print(f"Transcription saved in {output_file}")
 
 if __name__ == "__main__":
     main()
